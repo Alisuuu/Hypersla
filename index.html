@@ -26,7 +26,7 @@
       border-radius: 8px;
       background: #1e88e5;
       color: white;
-      margin-bottom: 20px;
+      margin: 10px;
       cursor: pointer;
     }
 
@@ -35,18 +35,20 @@
       height: 80vh;
       border: none;
       border-radius: 12px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>Entrar em uma sessão Hyperbeam</h1>
-  <button onclick="startSession()">Iniciar sessão</button>
-  <button onclick="resetSession()">Reiniciar</button>
+  <button onclick="startSession()">Iniciar Sessão</button>
+  <button onclick="resetSession()">Encerrar Sessão</button>
 
   <div id="iframeContainer"></div>
 
   <script>
     let activeSessionURL = null;
+    let activeSessionID = null;
 
     async function startSession() {
       try {
@@ -58,13 +60,14 @@
         const res = await fetch('/start-session');
         const data = await res.json();
 
-        if (!data.url) {
+        if (!data.url || !data.id) {
           alert('Erro: sessão não criada');
           console.error(data);
           return;
         }
 
         activeSessionURL = data.url;
+        activeSessionID = data.id;
         showIframe(activeSessionURL);
 
       } catch (err) {
@@ -83,8 +86,28 @@
       container.appendChild(iframe);
     }
 
-    function resetSession() {
+    async function resetSession() {
+      if (!activeSessionID) {
+        activeSessionURL = null;
+        document.getElementById('iframeContainer').innerHTML = '';
+        return;
+      }
+
+      try {
+        await fetch(`https://engine.hyperbeam.com/v0/vm/${activeSessionID}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer sk_test_Kb8ZQgsU7SJAuV6UXNgvydVT6baIRKTF4o6Q4nHN6ec'
+          }
+        });
+        alert('Sessão encerrada!');
+      } catch (err) {
+        alert('Erro ao encerrar sessão');
+        console.error(err);
+      }
+
       activeSessionURL = null;
+      activeSessionID = null;
       document.getElementById('iframeContainer').innerHTML = '';
     }
   </script>
