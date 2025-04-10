@@ -3,38 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hyperbeam App</title>
+  <title>Hyperbeam Viewer</title>
   <style>
-    body {
-      background: #121212;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 20px;
+    html, body {
       margin: 0;
+      padding: 0;
+      background: #000;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
     }
-    button {
-      padding: 14px 24px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      background: #1e88e5;
+
+    #topbar {
+      background: #111;
       color: white;
-      margin: 10px 5px;
+      padding: 10px 16px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 18px;
+      position: relative;
     }
+
+    #startBtn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: #e53935;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #iframeContainer {
+      width: 100%;
+      height: calc(100% - 50px);
+    }
+
     iframe {
       width: 100%;
-      height: 75vh;
+      height: 100%;
       border: none;
-      border-radius: 12px;
-      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h2>Iniciar Navegador Virtual</h2>
-  <button onclick="startSession()">Iniciar sessão</button>
-  <button onclick="endSession()">Encerrar sessão</button>
+  <div id="topbar">
+    Hyperbeam Mobile
+    <button id="startBtn" onclick="startSession()">Iniciar</button>
+  </div>
   <div id="iframeContainer"></div>
 
   <script>
@@ -49,18 +67,6 @@
         document.getElementById('iframeContainer').appendChild(iframe);
       } catch (err) {
         alert('Erro ao iniciar sessão');
-        console.error(err);
-      }
-    }
-
-    async function endSession() {
-      try {
-        const res = await fetch('/end-session', { method: 'DELETE' });
-        const data = await res.json();
-        alert(data.message || 'Sessão encerrada');
-        document.getElementById('iframeContainer').innerHTML = '';
-      } catch (err) {
-        alert('Erro ao encerrar sessão');
         console.error(err);
       }
     }
