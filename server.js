@@ -1,32 +1,32 @@
-const express = require("express");
-const axios = require("axios");
-const path = require("path");
-require("dotenv").config();
+const express = require('express');
+const axios = require('axios');
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.HYPERBEAM_API_KEY;
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static('public')); // Onde vai o index.html
 
-app.get("/start-session", async (req, res) => {
+app.get('/create-room', async (req, res) => {
   try {
     const response = await axios.post(
-      "https://engine.hyperbeam.com/v0/vm",
+      'https://w2g.tv/rooms/create.json',
       {
-        user_id: "guest123"
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-        },
+        w2g_api_key: process.env.W2G_API_KEY,
+        share: '',
+        bg_color: '#181818',
+        bg_opacity: '100'
       }
     );
-    res.json({ url: response.data.embed_url });
+
+    const streamKey = response.data.streamkey;
+    const embedUrl = `https://w2g.tv/rooms/${streamKey}/embed`;
+
+    res.json({ url: embedUrl });
   } catch (error) {
-    console.error("Erro ao iniciar sessão:", error.message);
-    res.status(500).json({ error: "Erro ao iniciar sessão" });
+    console.error('Erro ao criar sala:', error.message);
+    res.status(500).json({ error: 'Erro ao criar sala' });
   }
 });
 
