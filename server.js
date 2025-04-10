@@ -7,7 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.HYPERBEAM_API_KEY;
 
-// Servir HTML da pasta public
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/start-session", async (req, res) => {
