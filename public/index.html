@@ -3,65 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hyperbeam Clone</title>
+  <title>Minha Sala Watch2Gether</title>
   <style>
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      height: 100%;
-      background: black;
-      overflow: hidden;
+      font-family: sans-serif;
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
 
-    #iframeContainer {
-      width: 100%;
-      height: 100%;
+    button {
+      background-color: #ffde59;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #ffd000;
     }
 
     iframe {
+      margin-top: 20px;
       width: 100%;
-      height: 100%;
+      height: 90vh;
       border: none;
     }
 
-    #startBtn {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #ffffff;
-      padding: 14px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      z-index: 2;
+    #container {
+      width: 100%;
+      max-width: 1000px;
+      padding: 20px;
     }
   </style>
 </head>
 <body>
-  <button id="startBtn">Iniciar Sessão</button>
-  <div id="iframeContainer"></div>
+  <div id="container">
+    <button onclick="startSession()">Iniciar sessão</button>
+    <div id="playerContainer" style="display:none;">
+      <iframe id="w2gIframe" allow="camera; microphone; autoplay"></iframe>
+    </div>
+  </div>
 
   <script>
-    document.getElementById("startBtn").addEventListener("click", async () => {
-      try {
-        const res = await fetch("/start-session");
-        const data = await res.json();
-        if (data.url) {
-          const iframe = document.createElement("iframe");
-          iframe.src = data.url;
-          iframe.allow = "clipboard-read; clipboard-write; microphone; camera";
-          document.getElementById("iframeContainer").appendChild(iframe);
-          document.getElementById("startBtn").style.display = "none";
-        } else {
-          alert("Sessão não encontrada.");
-        }
-      } catch (err) {
-        console.error("Erro ao iniciar sessão:", err);
-        alert("Erro ao iniciar sessão.");
+    async function startSession() {
+      const res = await fetch('/create-room');
+      const data = await res.json();
+
+      if (data.url) {
+        document.querySelector('button').style.display = 'none';
+        const iframe = document.getElementById('w2gIframe');
+        iframe.src = data.url;
+        document.getElementById('playerContainer').style.display = 'block';
+      } else {
+        alert("Erro ao criar sala.");
       }
-    });
+    }
   </script>
 </body>
 </html>
