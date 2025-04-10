@@ -3,36 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hyperbeam Mobile</title>
+  <title>Hyperbeam App</title>
   <style>
     body {
-      margin: 0;
-      padding: 20px;
+      background: #121212;
+      color: white;
       font-family: sans-serif;
-      background-color: #121212;
-      color: #fff;
       text-align: center;
+      padding: 20px;
+      margin: 0;
     }
-
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 16px;
-    }
-
     button {
       padding: 14px 24px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       border: none;
       border-radius: 8px;
       background: #1e88e5;
       color: white;
-      margin: 10px;
-      cursor: pointer;
+      margin: 10px 5px;
     }
-
-    #iframeContainer iframe {
+    iframe {
       width: 100%;
-      height: 80vh;
+      height: 75vh;
       border: none;
       border-radius: 12px;
       margin-top: 20px;
@@ -40,75 +32,37 @@
   </style>
 </head>
 <body>
-  <h1>Entrar em uma sessão Hyperbeam</h1>
-  <button onclick="startSession()">Iniciar Sessão</button>
-  <button onclick="resetSession()">Encerrar Sessão</button>
-
+  <h2>Iniciar Navegador Virtual</h2>
+  <button onclick="startSession()">Iniciar sessão</button>
+  <button onclick="endSession()">Encerrar sessão</button>
   <div id="iframeContainer"></div>
 
   <script>
-    let activeSessionURL = null;
-    let activeSessionID = null;
-
     async function startSession() {
       try {
-        if (activeSessionURL) {
-          showIframe(activeSessionURL);
-          return;
-        }
-
         const res = await fetch('/start-session');
         const data = await res.json();
-
-        if (!data.url || !data.id) {
-          alert('Erro: sessão não criada');
-          console.error(data);
-          return;
-        }
-
-        activeSessionURL = data.url;
-        activeSessionID = data.id;
-        showIframe(activeSessionURL);
-
+        const iframe = document.createElement('iframe');
+        iframe.src = data.url;
+        iframe.allow = "clipboard-read; clipboard-write; microphone; camera";
+        document.getElementById('iframeContainer').innerHTML = '';
+        document.getElementById('iframeContainer').appendChild(iframe);
       } catch (err) {
         alert('Erro ao iniciar sessão');
         console.error(err);
       }
     }
 
-    function showIframe(url) {
-      const iframe = document.createElement('iframe');
-      iframe.src = url;
-      iframe.allow = "clipboard-read; clipboard-write; microphone; camera";
-
-      const container = document.getElementById('iframeContainer');
-      container.innerHTML = '';
-      container.appendChild(iframe);
-    }
-
-    async function resetSession() {
-      if (!activeSessionID) {
-        activeSessionURL = null;
-        document.getElementById('iframeContainer').innerHTML = '';
-        return;
-      }
-
+    async function endSession() {
       try {
-        await fetch(`https://engine.hyperbeam.com/v0/vm/${activeSessionID}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': 'Bearer sk_test_Kb8ZQgsU7SJAuV6UXNgvydVT6baIRKTF4o6Q4nHN6ec'
-          }
-        });
-        alert('Sessão encerrada!');
+        const res = await fetch('/end-session', { method: 'DELETE' });
+        const data = await res.json();
+        alert(data.message || 'Sessão encerrada');
+        document.getElementById('iframeContainer').innerHTML = '';
       } catch (err) {
         alert('Erro ao encerrar sessão');
         console.error(err);
       }
-
-      activeSessionURL = null;
-      activeSessionID = null;
-      document.getElementById('iframeContainer').innerHTML = '';
     }
   </script>
 </body>
