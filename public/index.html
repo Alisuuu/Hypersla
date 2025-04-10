@@ -3,42 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hyperbeam Viewer</title>
+  <title>Hyperbeam Clone</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
       height: 100%;
+      background: black;
       overflow: hidden;
-      font-family: sans-serif;
-    }
-
-    #topbar {
-      background: #111;
-      color: white;
-      padding: 10px 16px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 18px;
-      position: relative;
-    }
-
-    #startBtn {
-      position: absolute;
-      top: 8px;
-      right: 12px;
-      background: #e53935;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
     }
 
     #iframeContainer {
       width: 100%;
-      height: calc(100% - 50px);
+      height: 100%;
     }
 
     iframe {
@@ -46,30 +23,45 @@
       height: 100%;
       border: none;
     }
+
+    #startBtn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #ffffff;
+      padding: 14px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
-  <div id="topbar">
-    Hyperbeam Mobile
-    <button id="startBtn" onclick="startSession()">Iniciar</button>
-  </div>
+  <button id="startBtn">Iniciar Sessão</button>
   <div id="iframeContainer"></div>
 
   <script>
-    async function startSession() {
+    document.getElementById("startBtn").addEventListener("click", async () => {
       try {
-        const res = await fetch('/start-session');
+        const res = await fetch("/start-session");
         const data = await res.json();
-        const iframe = document.createElement('iframe');
-        iframe.src = data.url;
-        iframe.allow = "clipboard-read; clipboard-write; microphone; camera";
-        document.getElementById('iframeContainer').innerHTML = '';
-        document.getElementById('iframeContainer').appendChild(iframe);
+        if (data.url) {
+          const iframe = document.createElement("iframe");
+          iframe.src = data.url;
+          iframe.allow = "clipboard-read; clipboard-write; microphone; camera";
+          document.getElementById("iframeContainer").appendChild(iframe);
+          document.getElementById("startBtn").style.display = "none";
+        } else {
+          alert("Sessão não encontrada.");
+        }
       } catch (err) {
-        alert('Erro ao iniciar sessão');
-        console.error(err);
+        console.error("Erro ao iniciar sessão:", err);
+        alert("Erro ao iniciar sessão.");
       }
-    }
+    });
   </script>
 </body>
 </html>
