@@ -13,7 +13,9 @@ app.get("/start-session", async (req, res) => {
   try {
     const response = await axios.post(
       "https://engine.hyperbeam.com/v0/vm",
-      {},
+      {
+        user_id: "guest123"
+      },
       {
         headers: {
           Authorization: `Bearer ${API_KEY}`,
